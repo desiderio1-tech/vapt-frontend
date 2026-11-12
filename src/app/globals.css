@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-vapt-blue: #002B5C;
+  --color-vapt-lightBlue: #0A4D9C;
+  --color-vapt-green: #00A859;
+  --color-vapt-gray: #F5F5F5;
+  --color-vapt-dark: #1A1A1A;
+}
+
+:root {
+  --vapt-blue: #002B5C;
+  --vapt-green: #00A859;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #F5F5F5;
+  color: #1A1A1A;
+}
+
+/* Classes de segurança para garantir que as cores aparecem */
+.bg-vapt-blue { background-color: #002B5C; }
+.bg-vapt-lightBlue { background-color: #0A4D9C; }
+.bg-vapt-green { background-color: #00A859; }
+.bg-vapt-gray { background-color: #F5F5F5; }
+.text-vapt-blue { color: #002B5C; }
+.text-vapt-green { color: #00A859; }
+.text-vapt-dark { color: #1A1A1A; }
+.hover\:bg-vapt-blue:hover { background-color: #002B5C; }
+.hover\:bg-vapt-green:hover { background-color: #00A859; }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #002B5C; border-radius: 4px; }
