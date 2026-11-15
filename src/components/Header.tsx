@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Search, User, PlusCircle, LogOut, Menu, X, MessageSquare, Heart } from 'lucide-react';
+import { Search, User, PlusCircle, LogOut, Menu, X, MessageSquare, Heart, Compass } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
 
@@ -34,11 +34,13 @@ export default function Header() {
     <header className="bg-vapt-blue text-white sticky top-0 z-50 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
         
+        {/* LOGO */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <div className="bg-white text-vapt-blue font-extrabold text-2xl px-3 py-1 rounded">V</div>
           <span className="text-2xl font-extrabold tracking-tight hidden sm:block">VAPT</span>
         </Link>
 
+        {/* BARRA DE PESQUISA */}
         <form onSubmit={handleSearch} className="flex-1 flex items-center bg-white rounded-lg overflow-hidden">
           <input
             type="text"
@@ -52,7 +54,17 @@ export default function Header() {
           </button>
         </form>
 
+        {/* BOTÕES DESKTOP */}
         <div className="hidden md:flex items-center gap-2">
+          
+          {/* BOTÃO EXPLORAR (Sempre visível) */}
+          <Link 
+            href="/explorar" 
+            className="flex items-center gap-1.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition shadow-sm"
+          >
+            <Compass size={18} /> Explorar
+          </Link>
+
           {user ? (
             <>
               {/* FAVORITOS */}
@@ -85,13 +97,25 @@ export default function Header() {
           )}
         </div>
 
+        {/* BOTÃO MENU MOBILE */}
         <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
           {menuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
+      {/* MENU MOBILE */}
       {menuOpen && (
         <div className="md:hidden bg-vapt-lightBlue px-4 py-3 flex flex-col gap-2 border-t border-white/10">
+          
+          {/* BOTÃO EXPLORAR MOBILE */}
+          <Link 
+            href="/explorar" 
+            onClick={() => setMenuOpen(false)} 
+            className="flex items-center gap-2 py-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg px-3 font-bold text-white mb-2"
+          >
+            <Compass size={18} /> Explorar Feed
+          </Link>
+
           {user ? (
             <>
               <Link href="/favoritos" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 py-2 hover:bg-white/10 rounded-lg px-3">
