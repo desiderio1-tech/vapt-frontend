@@ -4,9 +4,13 @@ let socket: Socket | null = null;
 
 export const getSocket = (): Socket => {
   if (!socket) {
-    // O Socket.io liga-se à raiz do backend (porta 5000), não ao /api
-    socket = io('http://localhost:5000', {
-      autoConnect: false, // Só conecta quando pedirmos
+    // Vai buscar o link da API (Render) e remove o /api para o Socket ligar à raiz
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const socketUrl = apiUrl.replace('/api', ''); 
+    
+    socket = io(socketUrl, {
+      autoConnect: false,
+      transports: ['websocket'], // Força o uso de websockets na nuvem
     });
   }
   return socket;
