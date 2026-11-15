@@ -29,7 +29,7 @@ export default function Header() {
 
   return (
     <header className="bg-vapt-blue text-white sticky top-0 z-50 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
         
         {/* LOGO */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
@@ -38,7 +38,7 @@ export default function Header() {
         </Link>
 
         {/* BARRA DE PESQUISA */}
-        <form onSubmit={handleSearch} className="flex-1 flex items-center bg-white rounded-lg overflow-hidden">
+        <form onSubmit={handleSearch} className="flex-1 max-w-2xl flex items-center bg-white rounded-lg overflow-hidden">
           <input
             type="text"
             value={searchTerm}
@@ -91,7 +91,6 @@ export default function Header() {
             </>
           )}
         </div>
-
       </div>
     </header>
   );
