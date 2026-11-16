@@ -2,14 +2,15 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Search, User, PlusCircle, LogOut, MessageSquare, Heart, Compass } from 'lucide-react';
+import { Search, User, PlusCircle, LogOut, MessageSquare, Heart, Compass, Bell } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
 
 export default function Header() {
   const router = useRouter();
-  const { user, logout, loadUser } = useAuthStore();
+  const { user, logout, loadUser, notifications, unreadCount, fetchNotifications, markNotificationsRead } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState('');
+  const [showNotif, setShowNotif] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -25,6 +26,13 @@ export default function Header() {
   const handleLogout = () => {
     logout();
     router.push('/');
+  };
+
+  const handleOpenNotifs = () => {
+    setShowNotif(!showNotif);
+    if (!showNotif && unreadCount > 0) {
+      markNotificationsRead();
+    }
   };
 
   return (
@@ -51,19 +59,53 @@ export default function Header() {
           </button>
         </form>
 
-        {/* BOTÕES DESKTOP (Escondidos no telemóvel) */}
+        {/* BOTÕES DESKTOP */}
         <div className="hidden md:flex items-center gap-2">
           
-          {/* BOTÃO EXPLORAR */}
-          <Link 
-            href="/explorar" 
-            className="flex items-center gap-1.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition shadow-sm"
-          >
+          <Link href="/explorar" className="flex items-center gap-1.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition shadow-sm">
             <Compass size={18} /> Explorar
           </Link>
 
           {user ? (
             <>
+              {/* NOTIFICAÇÕES */}
+              <div className="relative">
+                <button onClick={handleOpenNotifs} className="relative hover:bg-white/10 p-2 rounded-lg transition text-gray-200 hover:text-white" title="Notificações">
+                  <Bell size={20} />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* DROPDOWN */}
+                {showNotif && (
+                  <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
+                    <div className="p-3 bg-gray-50 border-b border-gray-100 font-bold text-vapt-blue flex justify-between items-center">
+                      <span>Notificações</span>
+                    </div>
+                    <div className="max-h-80 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <p className="p-4 text-center text-sm text-gray-500">Sem notificações.</p>
+                      ) : (
+                        notifications.map((n: any) => (
+                          <Link 
+                            key={n.id} 
+                            href={n.link || '#'} 
+                            onClick={() => setShowNotif(false)}
+                            className={`block p-4 border-b border-gray-50 hover:bg-gray-50 transition ${!n.isRead ? 'bg-blue-50/50' : ''}`}
+                          >
+                            <p className="text-sm font-bold text-vapt-dark">{n.title}</p>
+                            <p className="text-xs text-gray-600 mt-1 line-clamp-2">{n.message}</p>
+                          </Link>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <Link href="/favoritos" className="hover:bg-white/10 px-3 py-2 rounded-lg transition text-gray-200 hover:text-white" title="Favoritos">
                 <Heart size={18} />
               </Link>
