@@ -1,17 +1,22 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import api from '@/lib/api';
+import { useAuthStore } from '@/store/authStore';
 import Link from 'next/link';
-import { MapPin, Search } from 'lucide-react';
+import { MapPin, Search, SlidersHorizontal } from 'lucide-react';
 
 function AnunciosContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const { user } = useAuthStore();
+  
   const [ads, setAds] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(searchParams.get('search') || '');
   const [categoria, setCategoria] = useState(searchParams.get('categoria') || '');
+  const [minhaCidade, setMinhaCidade] = useState(false);
 
   const categorias = [
     { name: 'Telemóveis', icon: '📱' },
@@ -30,6 +35,8 @@ function AnunciosContent() {
       const params = new URLSearchParams();
       if (search) params.append('search', search);
       if (categoria) params.append('category', categoria);
+      if (minhaCidade && user?.city) params.append('city', user.city);
+      
       const res = await api.get(`/ads?${params.toString()}`);
       setAds(res.data);
     } catch (error) {
@@ -41,7 +48,7 @@ function AnunciosContent() {
 
   useEffect(() => {
     fetchAds();
-  }, [categoria]);
+  }, [categoria, minhaCidade]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,38 +56,51 @@ function AnunciosContent() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      {/* CABEÇALHO */}
+    <div className="max-w-7xl mx-auto px-4 py-6 md:py-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-vapt-blue">Todos os anúncios</h1>
-        <p className="text-gray-500 mt-1">Encontra o que precisas em todo Moçambique.</p>
+        <h1 className="text-2xl md:text-3xl font-bold text-vapt-blue">Todos os anúncios</h1>
+        <p className="text-sm md:text-base text-gray-500 mt-1">Encontra o que precisas em todo Moçambique.</p>
       </div>
 
-      {/* PESQUISA */}
-      <form onSubmit={handleSearch} className="flex gap-2 mb-6">
-        <div className="flex-1 flex items-center bg-white rounded-lg border border-gray-300 overflow-hidden">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Pesquisar por título ou descrição..."
-            className="flex-1 px-4 py-3 outline-none text-sm"
-          />
-        </div>
-        <button
-          type="submit"
-          className="bg-vapt-blue hover:bg-vapt-lightBlue text-white px-6 rounded-lg font-semibold flex items-center gap-2"
-        >
-          <Search size={18} /> Pesquisar
-        </button>
-      </form>
+      {/* PESQUISA E FILTRO */}
+      <div className="flex flex-col md:flex-row gap-3 mb-6">
+        <form onSubmit={handleSearch} className="flex-1 flex gap-2">
+          <div className="flex-1 flex items-center bg-white rounded-lg border border-gray-300 overflow-hidden focus-within:border-vapt-blue">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Pesquisar por título ou descrição..."
+              className="flex-1 px-4 py-2.5 outline-none text-sm"
+            />
+          </div>
+          <button type="submit" className="bg-vapt-blue hover:bg-vapt-lightBlue text-white px-4 md:px-6 rounded-lg font-semibold flex items-center gap-2 transition">
+            <Search size={18} /> <span className="hidden md:block">Pesquisar</span>
+          </button>
+        </form>
+
+        {/* BOTÃO PERTO DE MIM */}
+        {user?.city && (
+          <button
+            onClick={() => setMinhaCidade(!minhaCidade)}
+            className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm transition border ${
+              minhaCidade 
+                ? 'bg-vapt-green text-white border-vapt-green' 
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            <MapPin size={18} /> 
+            {minhaCidade ? `Só em ${user.city}` : 'Perto de mim'}
+          </button>
+        )}
+      </div>
 
       {/* FILTROS DE CATEGORIA */}
-      <div className="flex gap-2 overflow-x-auto pb-3 mb-6">
+      <div className="flex gap-2 overflow-x-auto pb-3 mb-6 hide-scrollbar">
         <button
           onClick={() => setCategoria('')}
           className={`px-4 py-2 rounded-lg whitespace-nowrap text-sm font-medium transition ${
-            categoria === '' ? 'bg-vapt-blue text-white' : 'bg-white text-gray-700 hover:bg-gray-100'
+            categoria === '' ? 'bg-vapt-blue text-white shadow-sm' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
           }`}
         >
           Todas
@@ -90,7 +110,7 @@ function AnunciosContent() {
             key={cat.name}
             onClick={() => setCategoria(cat.name)}
             className={`px-4 py-2 rounded-lg whitespace-nowrap text-sm font-medium transition ${
-              categoria === cat.name ? 'bg-vapt-blue text-white' : 'bg-white text-gray-700 hover:bg-gray-100'
+              categoria === cat.name ? 'bg-vapt-blue text-white shadow-sm' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
             }`}
           >
             {cat.icon} {cat.name}
@@ -98,24 +118,30 @@ function AnunciosContent() {
         ))}
       </div>
 
-      {/* LISTA */}
+      {/* LISTA DE ANÚNCIOS */}
       {loading ? (
-        <div className="text-center py-20 text-gray-500">A carregar anúncios...</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 animate-pulse">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <div key={i} className="bg-white rounded-xl h-56 md:h-72"></div>
+          ))}
+        </div>
       ) : ads.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-2xl">
           <div className="text-6xl mb-4">🔍</div>
           <h3 className="text-xl font-bold text-gray-700">Nenhum anúncio encontrado</h3>
-          <p className="text-gray-500 mt-2">Tenta ajustar a tua pesquisa.</p>
+          <p className="text-gray-500 mt-2">Tenta ajustar a tua pesquisa ou filtros.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
           {ads.map((ad) => (
             <Link
               key={ad.id}
               href={`/anuncios/${ad.id}`}
-              className="bg-white rounded-xl overflow-hidden hover:shadow-lg transition group"
+              className={`bg-white rounded-xl overflow-hidden hover:shadow-lg transition group border flex flex-col ${
+                ad.isFeatured ? 'border-yellow-400 shadow-md' : 'border-gray-100'
+              }`}
             >
-              <div className="h-44 bg-gray-100 overflow-hidden">
+              <div className="h-32 md:h-48 bg-gray-100 overflow-hidden relative">
                 {ad.images && ad.images[0] ? (
                   <img
                     src={ad.images[0]}
@@ -123,22 +149,48 @@ function AnunciosContent() {
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-5xl">📦</div>
+                  <div className="w-full h-full flex items-center justify-center text-4xl md:text-5xl">📦</div>
                 )}
-              </div>
-              <div className="p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
-                    {ad.condition}
-                  </span>
+                
+                {/* ETIQUETAS DO ALGORITMO */}
+                <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
+                  {ad.isFeatured && (
+                    <span className="bg-yellow-400 text-yellow-900 text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+                      ⭐ Destaque
+                    </span>
+                  )}
+                  {!ad.isFeatured && ad.isTrending && (
+                    <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+                      🔥 Em Alta
+                    </span>
+                  )}
                 </div>
-                <h3 className="font-semibold text-vapt-dark truncate">{ad.title}</h3>
-                <p className="text-lg font-bold text-vapt-blue mt-1">
-                  {ad.price.toLocaleString('pt-MZ')} MT
-                </p>
-                <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
-                  <MapPin size={12} /> {ad.location}
-                </p>
+                
+                <span className="absolute bottom-2 right-2 bg-white/90 backdrop-blur text-[10px] font-bold text-vapt-blue px-2 py-0.5 rounded shadow-sm">
+                  {ad.condition}
+                </span>
+              </div>
+              
+              <div className="p-2 md:p-4 flex flex-col flex-1 justify-between">
+                <div>
+                  <h3 className="font-semibold text-vapt-dark truncate leading-tight text-xs md:text-base">{ad.title}</h3>
+                  <p className="text-[10px] md:text-xs text-gray-500 mt-1 truncate">{ad.category?.name}</p>
+                </div>
+                <div>
+                  <p className="text-sm md:text-lg font-bold text-vapt-blue mt-1 md:mt-2">
+                    {ad.price.toLocaleString('pt-MZ')} MT
+                  </p>
+                  <div className="flex items-center justify-between mt-1 md:mt-2">
+                    <p className="text-[10px] md:text-xs text-gray-500 flex items-center gap-1 truncate">
+                      <MapPin size={10} className="md:w-3 md:h-3" /> {ad.location}
+                    </p>
+                    {ad.favoriteCount > 0 && (
+                      <p className="text-[10px] md:text-xs text-red-500 font-medium flex items-center gap-1">
+                        ❤️ {ad.favoriteCount}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             </Link>
           ))}
