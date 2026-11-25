@@ -20,6 +20,7 @@ export default function AnuncioDetalhePage() {
   
   // Estados para a avaliação do vendedor
   const [sellerRating, setSellerRating] = useState({ average: 0, total: 0 });
+  const [sellerReviews, setSellerReviews] = useState<any[]>([]);
 
   useEffect(() => {
     loadUser();
@@ -45,6 +46,7 @@ export default function AnuncioDetalhePage() {
       api.get(`/reviews/seller/${ad.user.id}`)
         .then(res => {
           setSellerRating({ average: res.data.average, total: res.data.total });
+          setSellerReviews(res.data.reviews.slice(0, 3)); // Mostrar apenas as 3 mais recentes
         })
         .catch(() => {});
     }
@@ -183,7 +185,7 @@ export default function AnuncioDetalhePage() {
                 <p className="font-semibold text-vapt-dark">{ad.user.name}</p>
                 <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5"><MapPin size={12} /> {ad.user.city || 'Moçambique'}</p>
                 
-                {/* AVALIAÇÃO DO VENDEDOR */}
+                {/* ESTRELAS DO VENDEDOR */}
                 <div className="flex items-center gap-1 mt-1">
                   <Star size={14} className="text-yellow-400 fill-yellow-400" />
                   <span className="text-sm font-bold text-gray-700">{sellerRating.average}</span>
@@ -191,9 +193,30 @@ export default function AnuncioDetalhePage() {
                 </div>
               </div>
             </div>
+            
             {ad.user.phone && !isOwner && (
               <div className="mt-4 flex items-center gap-2 text-sm text-gray-600 bg-gray-50 rounded-lg p-3 border border-gray-100">
                 <Phone size={14} className="text-vapt-green" /> {ad.user.phone}
+              </div>
+            )}
+
+            {/* COMENTÁRIOS DAS AVALIAÇÕES */}
+            {sellerReviews.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <h4 className="text-xs font-bold text-gray-500 mb-2 uppercase">O que dizem os compradores</h4>
+                <div className="space-y-3">
+                  {sellerReviews.map((rev, index) => (
+                    <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                      <div className="flex items-center gap-1 mb-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} size={10} className={i < rev.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'} />
+                        ))}
+                        <span className="text-xs text-gray-500 ml-1">{rev.reviewer.name}</span>
+                      </div>
+                      {rev.comment && <p className="text-xs text-gray-600 italic">"{rev.comment}"</p>}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
