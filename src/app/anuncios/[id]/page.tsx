@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import toast from 'react-hot-toast';
-import { MapPin, Phone, ArrowLeft, Heart, Share2, MessageCircle, Tag, Eye } from 'lucide-react';
+import { MapPin, Phone, ArrowLeft, Heart, Share2, MessageCircle, Tag, Eye, Star } from 'lucide-react';
 
 export default function AnuncioDetalhePage() {
   const { id } = useParams();
@@ -17,6 +17,9 @@ export default function AnuncioDetalhePage() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [startingChat, setStartingChat] = useState(false);
   const [isFav, setIsFav] = useState(false);
+  
+  // Estados para a avaliação do vendedor
+  const [sellerRating, setSellerRating] = useState({ average: 0, total: 0 });
 
   useEffect(() => {
     loadUser();
@@ -36,14 +39,16 @@ export default function AnuncioDetalhePage() {
       });
   }, [id, router]);
 
-  // Verificar se já está nos favoritos (se o user estiver logado)
+  // Ir buscar a avaliação do vendedor assim que o anúncio carregar
   useEffect(() => {
-    if (user && ad) {
-      // Numa versão futura, podes buscar os favoritos do user para saber se está marcado
-      // Por agora, deixamos falso ao carregar
-      setIsFav(false); 
+    if (ad?.user?.id) {
+      api.get(`/reviews/seller/${ad.user.id}`)
+        .then(res => {
+          setSellerRating({ average: res.data.average, total: res.data.total });
+        })
+        .catch(() => {});
     }
-  }, [user, ad]);
+  }, [ad]);
 
   if (loading) return <div className="text-center py-20 text-gray-500 animate-pulse">A carregar anúncio...</div>;
   if (!ad) return null;
@@ -177,6 +182,13 @@ export default function AnuncioDetalhePage() {
               <div>
                 <p className="font-semibold text-vapt-dark">{ad.user.name}</p>
                 <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5"><MapPin size={12} /> {ad.user.city || 'Moçambique'}</p>
+                
+                {/* AVALIAÇÃO DO VENDEDOR */}
+                <div className="flex items-center gap-1 mt-1">
+                  <Star size={14} className="text-yellow-400 fill-yellow-400" />
+                  <span className="text-sm font-bold text-gray-700">{sellerRating.average}</span>
+                  <span className="text-xs text-gray-500">({sellerRating.total} avaliações)</span>
+                </div>
               </div>
             </div>
             {ad.user.phone && !isOwner && (
