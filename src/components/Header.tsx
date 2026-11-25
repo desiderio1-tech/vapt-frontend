@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Search, User, PlusCircle, LogOut, MessageSquare, Heart, Compass, Bell } from 'lucide-react';
+import { Search, User, PlusCircle, LogOut, MessageSquare, Heart, Compass, Bell, ShieldAlert } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
 
@@ -66,6 +66,13 @@ export default function Header() {
             <Compass size={18} /> Explorar
           </Link>
 
+          {/* BOTÃO DE ADMIN (Só aparece se o role for admin) */}
+          {user?.role === 'admin' && (
+            <Link href="/admin" className="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold text-sm transition shadow-sm border border-red-500">
+              <ShieldAlert size={18} /> Admin
+            </Link>
+          )}
+
           {user ? (
             <>
               {/* NOTIFICAÇÕES */}
@@ -79,21 +86,16 @@ export default function Header() {
                   )}
                 </button>
 
-                {/* DROPDOWN */}
+                {/* DROPDOWN DE NOTIFICAÇÕES */}
                 {showNotif && (
                   <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
-                    <div className="p-3 bg-gray-50 border-b border-gray-100 font-bold text-vapt-blue flex justify-between items-center">
-                      <span>Notificações</span>
-                    </div>
+                    <div className="p-3 bg-gray-50 border-b border-gray-100 font-bold text-vapt-blue">Notificações</div>
                     <div className="max-h-80 overflow-y-auto">
                       {notifications.length === 0 ? (
                         <p className="p-4 text-center text-sm text-gray-500">Sem notificações.</p>
                       ) : (
                         notifications.map((n: any) => (
-                          <Link 
-                            key={n.id} 
-                            href={n.link || '#'} 
-                            onClick={() => setShowNotif(false)}
+                          <Link key={n.id} href={n.link || '#'} onClick={() => setShowNotif(false)}
                             className={`block p-4 border-b border-gray-50 hover:bg-gray-50 transition ${!n.isRead ? 'bg-blue-50/50' : ''}`}
                           >
                             <p className="text-sm font-bold text-vapt-dark">{n.title}</p>
