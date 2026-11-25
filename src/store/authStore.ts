@@ -8,6 +8,7 @@ interface User {
   phone?: string;
   city?: string;
   avatar?: string;
+  role: string; // <-- ADICIONA ESTA LINHA
 }
 
 interface AuthState {
