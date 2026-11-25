@@ -1,53 +1,51 @@
+'use client'; // Necessário para usares o alert/onClick
+
 import Link from 'next/link';
+import toast from 'react-hot-toast';
+import { Download, Smartphone } from 'lucide-react';
 
 export default function Footer() {
+  
+  const handleInstallAndroid = () => {
+    toast.success('Para instalar no Android:\n1. Abre o menu do Chrome (3 pontos).\n2. Clica em "Instalar aplicação".', { 
+      duration: 6000, 
+      icon: '🤖' 
+    });
+  };
+
+  const handleInstalliOS = () => {
+    toast.success('Para instalar no iPhone:\n1. Clica no botão Partilhar do Safari.\n2. Escolhe "Adicionar ao ecrã principal".', { 
+      duration: 6000, 
+      icon: '🍎' 
+    });
+  };
+
   return (
     <footer className="bg-vapt-blue text-white mt-16">
       <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
-        {/* COLUNA 1 */}
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <div className="bg-white text-vapt-blue font-extrabold text-xl px-2 py-1 rounded">
-              V
-            </div>
-            <span className="text-xl font-extrabold">VAPT</span>
-          </div>
-          <p className="text-sm text-blue-200">
-            O supermercado de usados mais perto de você. Compre e venda de forma simples, segura e rápida.
-          </p>
-        </div>
+        {/* ... (Mantém as colunas 1, 2 e 3 iguais) ... */}
 
-        {/* COLUNA 2 */}
+        {/* COLUNA 4 - INSTALAR APP */}
         <div>
-          <h4 className="font-bold mb-4">Categorias</h4>
-          <ul className="space-y-2 text-sm text-blue-200">
-            <li><Link href="/anuncios?categoria=Telemóveis" className="hover:text-white">Telemóveis</Link></li>
-            <li><Link href="/anuncios?categoria=Computadores" className="hover:text-white">Computadores</Link></li>
-            <li><Link href="/anuncios?categoria=Veículos" className="hover:text-white">Veículos</Link></li>
-            <li><Link href="/anuncios?categoria=Móveis" className="hover:text-white">Móveis</Link></li>
-          </ul>
-        </div>
-
-        {/* COLUNA 3 */}
-        <div>
-          <h4 className="font-bold mb-4">Ajuda</h4>
-          <ul className="space-y-2 text-sm text-blue-200">
-            <li><Link href="#" className="hover:text-white">Como vender</Link></li>
-            <li><Link href="#" className="hover:text-white">Segurança</Link></li>
-            <li><Link href="#" className="hover:text-white">Termos de uso</Link></li>
-            <li><Link href="#" className="hover:text-white">Contacto</Link></li>
-          </ul>
-        </div>
-
-        {/* COLUNA 4 */}
-        <div>
-          <h4 className="font-bold mb-4">Instala a App</h4>
+          <h4 className="font-bold mb-4 flex items-center gap-2">
+            <Smartphone size={18} /> Instala o VAPT
+          </h4>
           <p className="text-sm text-blue-200 mb-4">
-            Adiciona o VAPT ao ecrã inicial do teu telemóvel.
+            Adiciona o VAPT ao ecrã inicial do teu telemóvel e usa como uma app nativa.
           </p>
           <div className="flex gap-2">
-            <span className="bg-white/10 px-3 py-2 rounded-lg text-xs">📱 Android</span>
-            <span className="bg-white/10 px-3 py-2 rounded-lg text-xs">🍎 iOS</span>
+            <button 
+              onClick={handleInstallAndroid}
+              className="flex-1 bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition"
+            >
+              <Download size={14} /> Android
+            </button>
+            <button 
+              onClick={handleInstalliOS}
+              className="flex-1 bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition"
+            >
+              <Download size={14} /> iOS
+            </button>
           </div>
         </div>
       </div>
