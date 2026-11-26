@@ -37,7 +37,7 @@ export default function Header() {
 
   return (
     <header className="bg-vapt-blue text-white sticky top-0 z-50 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-2 md:gap-3">
         
         {/* LOGO */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
@@ -52,12 +52,19 @@ export default function Header() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="O que você procura?"
-            className="flex-1 px-4 py-2 text-vapt-dark outline-none text-sm"
+            className="flex-1 px-3 md:px-4 py-2 text-vapt-dark outline-none text-sm"
           />
-          <button type="submit" className="bg-vapt-green hover:bg-green-700 px-4 py-2 text-white transition">
+          <button type="submit" className="bg-vapt-green hover:bg-green-700 px-3 md:px-4 py-2 text-white transition">
             <Search size={18} />
           </button>
         </form>
+
+        {/* BOTÃO DE LOGIN (Visível apenas no telemóvel quando não está logado) */}
+        {!user && (
+          <Link href="/login" className="md:hidden bg-vapt-green hover:bg-green-700 px-3 py-1.5 rounded-lg font-bold text-xs shrink-0">
+            Entrar
+          </Link>
+        )}
 
         {/* BOTÕES DESKTOP */}
         <div className="hidden md:flex items-center gap-2">
@@ -66,7 +73,6 @@ export default function Header() {
             <Compass size={18} /> Explorar
           </Link>
 
-          {/* BOTÃO DE ADMIN (Só aparece se o role for admin) */}
           {user?.role === 'admin' && (
             <Link href="/admin" className="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold text-sm transition shadow-sm border border-red-500">
               <ShieldAlert size={18} /> Admin
@@ -75,7 +81,6 @@ export default function Header() {
 
           {user ? (
             <>
-              {/* NOTIFICAÇÕES */}
               <div className="relative">
                 <button onClick={handleOpenNotifs} className="relative hover:bg-white/10 p-2 rounded-lg transition text-gray-200 hover:text-white" title="Notificações">
                   <Bell size={20} />
@@ -86,7 +91,6 @@ export default function Header() {
                   )}
                 </button>
 
-                {/* DROPDOWN DE NOTIFICAÇÕES */}
                 {showNotif && (
                   <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
                     <div className="p-3 bg-gray-50 border-b border-gray-100 font-bold text-vapt-blue">Notificações</div>
