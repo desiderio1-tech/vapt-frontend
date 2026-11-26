@@ -1,15 +1,14 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import Link from 'next/link';
-import { MapPin, Search, SlidersHorizontal } from 'lucide-react';
+import { MapPin, Search } from 'lucide-react';
 
 function AnunciosContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const { user } = useAuthStore();
   
   const [ads, setAds] = useState<any[]>([]);
@@ -62,7 +61,6 @@ function AnunciosContent() {
         <p className="text-sm md:text-base text-gray-500 mt-1">Encontra o que precisas em todo Moçambique.</p>
       </div>
 
-      {/* PESQUISA E FILTRO */}
       <div className="flex flex-col md:flex-row gap-3 mb-6">
         <form onSubmit={handleSearch} className="flex-1 flex gap-2">
           <div className="flex-1 flex items-center bg-white rounded-lg border border-gray-300 overflow-hidden focus-within:border-vapt-blue">
@@ -79,7 +77,6 @@ function AnunciosContent() {
           </button>
         </form>
 
-        {/* BOTÃO PERTO DE MIM */}
         {user?.city && (
           <button
             onClick={() => setMinhaCidade(!minhaCidade)}
@@ -95,7 +92,6 @@ function AnunciosContent() {
         )}
       </div>
 
-      {/* FILTROS DE CATEGORIA */}
       <div className="flex gap-2 overflow-x-auto pb-3 mb-6 hide-scrollbar">
         <button
           onClick={() => setCategoria('')}
@@ -118,7 +114,6 @@ function AnunciosContent() {
         ))}
       </div>
 
-      {/* LISTA DE ANÚNCIOS */}
       {loading ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 animate-pulse">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
@@ -126,10 +121,18 @@ function AnunciosContent() {
           ))}
         </div>
       ) : ads.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-2xl">
-          <div className="text-6xl mb-4">🔍</div>
-          <h3 className="text-xl font-bold text-gray-700">Nenhum anúncio encontrado</h3>
-          <p className="text-gray-500 mt-2">Tenta ajustar a tua pesquisa ou filtros.</p>
+        <div className="text-center py-20 bg-white rounded-3xl shadow-sm border border-gray-100 max-w-2xl mx-auto">
+          <div className="text-7xl mb-4 opacity-50">📭</div>
+          <h3 className="text-2xl font-bold text-vapt-dark mb-2">Nenhum resultado</h3>
+          <p className="text-gray-500 mb-6 max-w-xs mx-auto text-sm">
+            Não encontrámos nada com esses filtros. Tenta usar palavras mais simples ou limpar os filtros.
+          </p>
+          <button 
+            onClick={() => { setSearch(''); setCategoria(''); setMinhaCidade(false); }}
+            className="bg-vapt-blue hover:bg-vapt-lightBlue text-white font-bold px-6 py-2.5 rounded-xl transition shadow-md"
+          >
+            Limpar Filtros
+          </button>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
@@ -152,7 +155,6 @@ function AnunciosContent() {
                   <div className="w-full h-full flex items-center justify-center text-4xl md:text-5xl">📦</div>
                 )}
                 
-                {/* ETIQUETAS DO ALGORITMO */}
                 <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
                   {ad.isFeatured && (
                     <span className="bg-yellow-400 text-yellow-900 text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">

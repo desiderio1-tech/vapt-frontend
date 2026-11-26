@@ -19,12 +19,11 @@ export default function FavoritosPage() {
     const adToRemove = favorites.find(a => a.id === id);
     if (adToRemove) {
       toggleFavorite(adToRemove);
-      setFavorites(getFavorites()); // Atualiza o ecrã após remover
+      setFavorites(getFavorites());
       toast.success('Removido dos favoritos.');
     }
   };
 
-  // Evita erros de renderização no servidor (Next.js) antes de ler o localStorage
   if (!mounted) return null; 
 
   return (
@@ -32,17 +31,14 @@ export default function FavoritosPage() {
       <h1 className="text-3xl font-bold text-vapt-blue mb-6">Os meus favoritos</h1>
 
       {favorites.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
-          <div className="text-6xl mb-4">💔</div>
-          <h3 className="text-xl font-bold text-gray-700">Ainda não tens favoritos</h3>
-          <p className="text-gray-500 mt-2 mb-6">
-            Explora os anúncios e guarda os que mais gostares para veres mais tarde.
+        <div className="text-center py-24 bg-white rounded-3xl shadow-sm border border-gray-100 max-w-lg mx-auto">
+          <div className="text-7xl mb-4">💔</div>
+          <h3 className="text-2xl font-bold text-vapt-dark mb-2">Sem favoritos</h3>
+          <p className="text-gray-500 mb-6 text-sm">
+            Guarda os produtos que mais gostas para os encontrares mais tarde.
           </p>
-          <Link
-            href="/anuncios"
-            className="inline-block bg-vapt-blue hover:bg-vapt-lightBlue text-white font-bold px-6 py-3 rounded-lg transition"
-          >
-            Explorar anúncios
+          <Link href="/explorar" className="inline-block bg-vapt-blue hover:bg-vapt-lightBlue text-white font-bold px-8 py-3 rounded-xl transition shadow-md">
+            Explorar Feed
           </Link>
         </div>
       ) : (

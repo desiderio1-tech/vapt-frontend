@@ -4,13 +4,14 @@ import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { MapPin, Heart, MessageCircle, MoreHorizontal } from 'lucide-react';
+import { MapPin, Heart, MessageCircle, MoreHorizontal, Compass } from 'lucide-react';
 import { toggleFavorite, isFavorite } from '@/lib/favorites';
 import { useAuthStore } from '@/store/authStore';
 
 export default function ExplorarPage() {
   const [ads, setAds] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [lastTap, setLastTap] = useState(0);
   const { user } = useAuthStore();
 
   useEffect(() => {
@@ -39,9 +40,18 @@ export default function ExplorarPage() {
     else toast.success('Removido dos favoritos.');
   };
 
+  const handleDoubleTap = (ad: any) => {
+    const now = Date.now();
+    const DOUBLE_PRESS_DELAY = 300;
+    if (now - lastTap < DOUBLE_PRESS_DELAY) {
+      handleFavorite(ad); // Duplo toque detetado
+    }
+    setLastTap(now);
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-vapt-gray">
         <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-vapt-blue"></div>
       </div>
     );
@@ -52,19 +62,19 @@ export default function ExplorarPage() {
       <div className="max-w-lg mx-auto px-4">
         
         <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-vapt-blue">Descobre o VAPT</h1>
+          <h1 className="text-2xl font-bold text-vapt-blue flex items-center gap-2">
+            <Compass className="text-orange-500" /> Explorar
+          </h1>
           <span className="text-sm text-gray-500">{ads.length} produtos</span>
         </div>
 
-        {/* FEED ESTILO INSTAGRAM */}
         <div className="space-y-8">
           {ads.map((ad) => {
             const isFav = isFavorite(ad.id);
             
             return (
-              <div key={ad.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+              <div key={ad.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 
-                {/* CABEÇALHO DO POST (Vendedor) */}
                 <div className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-3">
                     <div className="bg-vapt-blue text-white w-10 h-10 rounded-full flex items-center justify-center font-bold">
@@ -82,8 +92,10 @@ export default function ExplorarPage() {
                   </button>
                 </div>
 
-                {/* IMAGEM DO PRODUTO */}
-                <Link href={`/anuncios/${ad.id}`} className="block relative bg-gray-100">
+                <div 
+                  className="block relative bg-gray-100 cursor-pointer"
+                  onClick={() => handleDoubleTap(ad)}
+                >
                   {ad.images && ad.images[0] ? (
                     <img 
                       src={ad.images[0]} 
@@ -93,13 +105,16 @@ export default function ExplorarPage() {
                   ) : (
                     <div className="w-full aspect-square flex items-center justify-center text-8xl bg-gray-100">📦</div>
                   )}
-                  {/* Etiqueta do Estado */}
                   <span className="absolute top-3 left-3 bg-white/90 backdrop-blur text-xs font-bold text-vapt-blue px-2 py-1 rounded-md shadow-sm">
                     {ad.condition}
                   </span>
-                </Link>
+                  {ad.isFeatured && (
+                    <span className="absolute top-3 right-3 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-md shadow-sm">
+                      ⭐ Destaque
+                    </span>
+                  )}
+                </div>
 
-                {/* BOTÕES DE AÇÃO (Like / Chat) */}
                 <div className="p-4">
                   <div className="flex items-center gap-4 mb-3">
                     <button 
@@ -116,7 +131,6 @@ export default function ExplorarPage() {
                     </Link>
                   </div>
 
-                  {/* PREÇO E TÍTULO */}
                   <p className="text-2xl font-black text-vapt-green mb-1">
                     {ad.price.toLocaleString('pt-MZ')} MT
                   </p>
@@ -125,7 +139,6 @@ export default function ExplorarPage() {
                     {ad.title}
                   </div>
                   
-                  {/* CATEGORIA E LINK */}
                   <p className="text-xs text-vapt-blue mt-2 font-medium bg-blue-50 inline-block px-2 py-1 rounded-md">
                     #{ad.category?.name.replace(/\s+/g, '')}
                   </p>
