@@ -1,3 +1,17 @@
+self.addEventListener('install', (event) => {
+  self.skipWaiting(); // Força o novo SW a ativar logo
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(clients.claim());
+});
+
+// ESTE É O HANDLER QUE O CHROME EXIGE PARA A INSTALAÇÃO
+self.addEventListener('fetch', (event) => {
+  // Podes deixar vazio, ou colocar lógica de cache no futuro
+});
+
+// Notificações Push (o que já tinhas)
 self.addEventListener('push', (event) => {
   const data = event.data?.json() ?? {};
   event.waitUntil(
@@ -25,8 +39,4 @@ self.addEventListener('notificationclick', (event) => {
       }
     })
   );
-});
-
-self.addEventListener('fetch', (event) => {
-  // Um handler vazio é suficiente para o Chrome aceitar a instalação
 });
