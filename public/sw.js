@@ -26,3 +26,7 @@ self.addEventListener('notificationclick', (event) => {
     })
   );
 });
+
+self.addEventListener('fetch', (event) => {
+  // Um handler vazio é suficiente para o Chrome aceitar a instalação
+});
