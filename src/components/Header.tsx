@@ -29,7 +29,7 @@ export default function Header() {
         {/* LOGO */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <div className="text-3xl font-black italic tracking-tighter text-white flex items-center gap-1">
-            <span className="text-vapt-green text-4xl">🛒</span> VAPT
+            <span className="text-vapt-green text-4xl">🛒</span> VAPT NOVO
           </div>
         </Link>
 
